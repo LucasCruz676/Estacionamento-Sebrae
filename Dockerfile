@@ -4,14 +4,15 @@ WORKDIR /app
 
 COPY . .
 
-RUN chmod +x gradlew
+RUN chmod +x mvnw
 
-RUN ./gradlew clean bootJar --stacktrace --info --no-daemon
-
-FROM eclipse-temurin:17-jre
+RUN ./mvnw clean package -DskipTests
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
+    
 
-COPY --from=build /app/build/libs/*.jar app.jar
+# O Maven gera o ficheiro .jar dentro da pasta /target (em vez de /build/libs)
+COPY --from=build /app/target/*.jar app.jar
 
 CMD ["java", "-jar", "app.jar"]
